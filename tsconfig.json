@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "lib": ["es2020"],
+    "module": "commonjs",
+    "types": ["node"],
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "outDir": "dist"
+  },
+  "files": ["src/index.ts"],
+  "include": ["src/**/*.d.ts"],
+  "exclude": ["node_modules", "src/tests"]
+}
