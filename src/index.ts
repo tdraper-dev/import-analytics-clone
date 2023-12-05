@@ -14,7 +14,7 @@ async function main() {
 
     const projectPath = join(dir, projectName);
 
-    const cleanup = await gitClone({ projectPath, projectName, author: 'bitovi', hosting: "github", username: "m-thompson-code", protocol: "https" });
+    const cleanup = await gitClone({ branchName: 'master', projectPath, projectName, author: 'bitovi', hosting: "github", username: "m-thompson-code", protocol: "https" });
 
     const ext = ["ts"];
     const filePaths = await glob(join(projectPath, `/**/*.@(${ext.join("|")})`));
