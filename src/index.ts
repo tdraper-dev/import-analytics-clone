@@ -1,31 +1,42 @@
-import { join } from "node:path";
-import { glob } from "glob";
-import { readFileSync } from "node:fs";
-import { getImports } from "./get-imports";
-import { gitClone } from "./git-clone";
+import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { getTempDir } from "./get-temp-dir";
+import { getOutput } from "./get-output";
 
 main();
 
 async function main() {
-    const dir = getTempDir();
+  const dir = getTempDir();
 
-    const projectName = "eslint-plugin";
+  if (!existsSync(__dirname + "/../input.json")) {
+    throw new Error("input.json not found");
+  }
 
-    const projectPath = join(dir, projectName);
+  const input: Input = JSON.parse(
+    readFileSync(__dirname + "/../input.json", "utf8")
+  );
 
-    const cleanup = await gitClone({ branchName: 'master', projectPath, projectName, author: 'bitovi', hosting: "github", username: "m-thompson-code", protocol: "https" });
+  const output = await getOutput(dir, input);
 
-    const ext = ["ts"];
-    const filePaths = await glob(join(projectPath, `/**/*.@(${ext.join("|")})`));
+  writeFileSync(__dirname + "/../output.json", JSON.stringify(output, null, 2));
+}
 
-    console.log(filePaths);
-    const imports = filePaths
-        .map((filePath) => readFileSync(filePath, "utf8"))
-        .map((file) => getImports(file, "@angular/core"))
-        .flat();
-
-    console.log(imports);
-
-    cleanup();
+export interface Input {
+  imports: string[];
+  library: string;
+  repos: Array<{
+    name: string;
+    git?: {
+      hosting?: "github" | "bitbucket";
+      protocol?: "ssh" | "https";
+      author?: string;
+      branch?: string;
+    };
+  }>;
+  git: {
+    username: string;
+    author: string;
+    hosting: "github" | "bitbucket";
+    protocol: "ssh" | "https";
+    branch: string;
+  };
 }
