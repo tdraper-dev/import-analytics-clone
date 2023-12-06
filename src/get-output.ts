@@ -7,7 +7,6 @@ import { storeError } from './errors';
 import type { Input, Output, Repo } from "./types";
 
 const getProjectOutput = async (dir: string, input: Input, repo: Repo) => {
-  console.log(dir, input, repo);
   const { imports, library, git } = input;
   const { name: repoName, git: gitOverride } = repo;
 
