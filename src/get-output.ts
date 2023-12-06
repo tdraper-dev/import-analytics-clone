@@ -3,15 +3,18 @@ import { readFileSync } from "node:fs";
 import { glob } from "glob";
 import { getImports } from "./get-imports";
 import { gitClone } from "./git-clone";
-import type { Input } from ".";
+import type { Input, Output } from "./types";
 
-export async function getOutput(dir: string, input: Input) {
+export async function getOutput(dir: string, input: Input): Promise<Output> {
   const { imports, library, repos, git } = input;
 
-  const output = {
+  const output: Output = {
     metadata: {
       date: new Date().toISOString().split("T")[0],
+      projectsThatIncludeImports: 0, // TODO
+      projectsThatExcludesImports: 0, // TODO
     },
+    projects: {},
   };
 
   for (let i = 0; i < repos.length; i++) {
@@ -29,10 +32,8 @@ export async function getOutput(dir: string, input: Input) {
       protocol: gitOverride?.protocol || git.protocol,
     });
 
-    const ext = ["ts"];
-    const filePaths = await glob(
-      join(projectPath, `/**/*.@(${ext.join("|")})`)
-    );
+    const ext = ["ts", "tsx"];
+    const filePaths = await glob(join(projectPath, `/**/*.@(${ext.join("|")})`), { windowsPathsNoEscape: true });
 
     const matchedImports = filePaths
       .map((filePath) => readFileSync(filePath, "utf8"))
@@ -46,7 +47,13 @@ export async function getOutput(dir: string, input: Input) {
 
     cleanup();
 
-    output[repo] = matchedImports;
+    const importsUsed = Object.keys(matchedImports).length;
+
+    output.projects[repo] = {
+      importsUsed,
+      importsNotUsed: imports.length - importsUsed,
+      imports: matchedImports,
+    };
   }
 
   return output;

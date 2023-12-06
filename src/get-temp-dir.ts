@@ -6,7 +6,7 @@ const tmpDir = tmpdir();
 
 export const getTempDir = () => {
   // Temporary directory based on os
-  // return mkdtempSync(`${tmpDir}${sep}`);
-  // Local directory
-  return join(__dirname, "../temp");
+  return mkdtempSync(`${tmpDir}${sep}`);
+  // Local directory (for debugging)
+  // return join(__dirname, "../temp");
 }
