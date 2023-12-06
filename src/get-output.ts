@@ -3,37 +3,28 @@ import { readFileSync } from "node:fs";
 import { glob } from "glob";
 import { getImports } from "./get-imports";
 import { gitClone } from "./git-clone";
-import type { Input, Output } from "./types";
+import { storeError } from './errors';
+import type { Input, Output, Repo } from "./types";
 
-export async function getOutput(dir: string, input: Input): Promise<Output> {
-  const { imports, library, repos, git } = input;
+const getProjectOutput = async (dir: string, input: Input, repo: Repo) => {
+  console.log(dir, input, repo);
+  const { imports, library, git } = input;
+  const { name: repoName, git: gitOverride } = repo;
 
-  const output: Output = {
-    metadata: {
-      date: new Date().toISOString().split("T")[0],
-      projectsThatIncludeImports: 0, // TODO
-      projectsThatExcludesImports: 0, // TODO
-    },
-    projects: {},
-  };
-
-  for (let i = 0; i < repos.length; i++) {
-    const { name: repo, git: gitOverride } = repos[i];
-
-    const projectPath = join(dir, repo);
+    const repoPath = join(dir, repoName);
 
     const cleanup = await gitClone({
-      branchName: gitOverride?.branch || git.branch,
-      projectPath,
-      projectName: repo,
-      author: gitOverride?.author || git.author,
+      branch: gitOverride?.branch || git.branch,
+      repoPath,
+      repoName,
+      owner: gitOverride?.owner || git.owner,
       hosting: gitOverride?.hosting || git.hosting,
-      username: git.username,
+      username: gitOverride?.username || git.username,
       protocol: gitOverride?.protocol || git.protocol,
     });
 
     const ext = ["ts", "tsx"];
-    const filePaths = await glob(join(projectPath, `/**/*.@(${ext.join("|")})`), { windowsPathsNoEscape: true });
+    const filePaths = await glob(join(repoPath, `/**/*.@(${ext.join("|")})`), { windowsPathsNoEscape: true });
 
     const matchedImports = filePaths
       .map((filePath) => readFileSync(filePath, "utf8"))
@@ -47,13 +38,34 @@ export async function getOutput(dir: string, input: Input): Promise<Output> {
 
     cleanup();
 
-    const importsUsed = Object.keys(matchedImports).length;
+    return { matchedImports, importsUsed: Object.keys(matchedImports).length };
+}
 
-    output.projects[repo] = {
-      importsUsed,
-      importsNotUsed: imports.length - importsUsed,
-      imports: matchedImports,
-    };
+export async function getOutput(dir: string, input: Input): Promise<Output> {
+  const { imports, repos } = input;
+
+  const output: Output = {
+    metadata: {
+      date: new Date().toISOString().split("T")[0],
+      reposThatIncludeImports: 0, // TODO
+      reposThatExcludesImports: 0, // TODO
+    },
+    repos: {},
+  };
+
+  for (const repo of repos) {
+    try {
+      const { matchedImports, importsUsed } = await getProjectOutput(dir, input, repo);
+
+      output.repos[repo.name] = {
+        importsUsed,
+        importsNotUsed: imports.length - importsUsed,
+        imports: matchedImports,
+      };
+    } catch(error) {
+      console.error(error);
+      storeError(error);
+    }
   }
 
   return output;
