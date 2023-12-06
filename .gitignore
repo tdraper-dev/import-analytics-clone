@@ -3,3 +3,4 @@ dist
 temp
 input.json
 output.json
+errors.json

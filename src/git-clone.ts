@@ -1,15 +1,6 @@
 import shell from "shelljs";
 import { rmSync } from "node:fs";
-
-interface GitCloneOptions {
-    hosting: 'bitbucket' | 'github';
-    protocol: 'ssh' | 'https';
-    projectName: string;
-    projectPath: string;
-    author: string;
-    username: string;
-    branchName: string;
-}
+import { GitCloneOptions } from './types';
 
 // Attempt to clean up if process exits for any reason
 process.on('exit', () => {
@@ -18,7 +9,7 @@ process.on('exit', () => {
 
 const cleanupMap: Record<string, () => void> = {};
 
-function execAsync(cmd, opts = {}) {
+function execAsync(cmd: string, opts: shell.ExecOptions = {}) {
     return new Promise(function (resolve, reject) {
         // Execute the command, reject if we exit non-zero (i.e. error)
         shell.exec(cmd, opts, function (code, stdout, stderr) {
@@ -29,10 +20,10 @@ function execAsync(cmd, opts = {}) {
 };
 
 export const gitClone = async (options: GitCloneOptions): Promise<() => void> => {
-    const { projectName, projectPath, hosting } = options;
+    const { repoName, repoPath, hosting } = options;
 
-    if (cleanupMap[projectName]) {
-        throw new Error('Duplicate projectName');
+    if (cleanupMap[repoName]) {
+        throw new Error('Duplicate repoName');
     }
 
     const execScript = hosting === 'github' ? gitCloneGithubScript(options) : gitCloneBitbucketScript(options);
@@ -40,45 +31,45 @@ export const gitClone = async (options: GitCloneOptions): Promise<() => void> =>
     await execAsync(execScript);
 
     const cleanup = () => {
-        cleanupMap[projectName] = null;
-        delete cleanupMap[projectName];
-        rmSync(projectPath, { recursive: true, force: true })
+        cleanupMap[repoName] = null;
+        delete cleanupMap[repoName];
+        rmSync(repoPath, { recursive: true, force: true })
     };
 
-    cleanupMap[projectName] = cleanup;
+    cleanupMap[repoName] = cleanup;
     return cleanup;
 };
 
 export const gitCloneGithubScript = (options: GitCloneOptions): string => {
     const {
-        protocol, author, projectName, projectPath, username, branchName
+        protocol, owner, repoName, repoPath, username, branch
     } = options; 
 
     if (protocol === 'ssh') {
-        return `git clone --branch ${branchName} git@github.com:${author}/${projectName}.git ${projectPath}`;
+        return `git clone --branch ${branch} git@github.com:${owner}/${repoName}.git ${repoPath}`;
     } else {
-        return `git clone --branch ${branchName} https://${username}@github.com/${author}/${projectName}.git ${projectPath}`;
-        // return `git clone https://github.com/${author}/${projectName}.git ${projectPath}`;
+        return `git clone --branch ${branch} https://${username}@github.com/${owner}/${repoName}.git ${repoPath}`;
+        // return `git clone https://github.com/${owner}/${repoName}.git ${repoPath}`;
     }
 }
 
 export const gitCloneBitbucketScript = (options: GitCloneOptions): string => {
     const {
-        protocol, author, projectName, projectPath, username, branchName
+        protocol, owner, repoName, repoPath, username, branch
     } = options;
 
     if (protocol === 'ssh') {
-        return `git clone --branch ${branchName} git@bitbucket.org:${author}/${projectName}.git ${projectPath}`;
+        return `git clone --branch ${branch} git@bitbucket.org:${owner}/${repoName}.git ${repoPath}`;
     } else {
-        return `git clone --branch ${branchName} https://${username}@bitbucket.org/${author}/${projectName}.git ${projectPath}`;
-        // return `git clone https://bitbucket.org/${author}/${projectName}.git ${projectPath}`;
+        return `git clone --branch ${branch} https://${username}@bitbucket.org/${owner}/${repoName}.git ${repoPath}`;
+        // return `git clone https://bitbucket.org/${owner}/${repoName}.git ${repoPath}`;
     }
 }
 
 export const cleanupAll = (): void => {
-    Object.entries(cleanupMap).forEach(([projectName, cleanup]) => {
-        cleanupMap[projectName] = null;
-        delete cleanupMap[projectName];
+    Object.entries(cleanupMap).forEach(([repoName, cleanup]) => {
+        cleanupMap[repoName] = null;
+        delete cleanupMap[repoName];
         cleanup()
     })
 };
