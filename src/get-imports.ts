@@ -1,5 +1,9 @@
+import { readFileSync } from "node:fs";
+import { getFilePaths } from "./get-file-paths";
+import { Input, Output, Repo } from "./types";
+
 // source: https://regexr.com/7oh1p
-export const getImportRegex = (importPath: string): RegExp => {
+const getImportRegex = (importPath: string): RegExp => {
   // return new RegExp(`import\\s+{([\\s,\\S]+?)}\\s+from\\s+[',"]${importPath}[',"]`, 'g');
   return new RegExp(
     `import\\s+{([^}]+?)}\\s+from\\s+[',"]${importPath}[',"]`,
@@ -7,11 +11,7 @@ export const getImportRegex = (importPath: string): RegExp => {
   );
 };
 
-export const getImports = (
-  file: string,
-  imports: string[],
-  library: string,
-) => {
+const findImports = (file: string, imports: string[], library: string) => {
   return (
     [...file.matchAll(getImportRegex(library))]
       // source: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/matchAll#:~:text=access%20capture%20groups
@@ -34,3 +34,23 @@ export const getImports = (
   // // remove commented out instances
   // .filter(importInstance => !importInstance.startsWith('/'));
 };
+
+export async function getImports(
+  repoPath: Repo["name"],
+  library: Input["library"],
+): Promise<Output["repos"][string]["imports"]> {
+  const libraryFiles = await getFilePaths(
+    repoPath,
+    `/**/*.@(${["ts", "tsx"].join("|")})`,
+  );
+
+  return libraryFiles
+    .map((filePath) => readFileSync(filePath, "utf8"))
+    .map((file) => findImports(file, library.imports, library.name))
+    .flat()
+    .reduce((acc, curr) => {
+      if (!acc[curr]) acc[curr] = { count: 0 };
+      acc[curr].count += 1;
+      return acc;
+    }, {});
+}

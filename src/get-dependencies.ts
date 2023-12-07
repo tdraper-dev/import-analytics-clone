@@ -1,12 +1,11 @@
 import { readFileSync } from "node:fs";
 import { getFilePaths } from "./get-file-paths";
+import type { Input, Output, Repo } from "./types";
 
 export async function getDependencies(
-  repoPath: string,
-  dependencies: string[],
-): Promise<{
-  [dependencyName: string]: boolean;
-}> {
+  repoPath: Repo["name"],
+  dependencies: Input["dependencies"],
+): Promise<Output["repos"][string]["dependencies"]> {
   if (!dependencies) return {};
 
   const matchedDependencies = dependencies.reduce((acc, curr) => {
