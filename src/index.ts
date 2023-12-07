@@ -14,7 +14,7 @@ async function main() {
   }
 
   const input: Input = JSON.parse(
-    readFileSync(__dirname + "/../input.json", "utf8")
+    readFileSync(__dirname + "/../input.json", "utf8"),
   );
 
   const output: Output = await getOutput(dir, input);
@@ -25,7 +25,7 @@ async function main() {
   const repoCount = Object.keys(input.repos).length;
 
   console.log(
-    `Repos ${repoCount} Success ${repoCount - errorCount} Errors ${errorCount}`
+    `Repos ${repoCount} Success ${repoCount - errorCount} Errors ${errorCount}`,
   );
 
   writeErrorsJson();
@@ -34,5 +34,3 @@ async function main() {
     console.log("Open `errors.json` to view errors");
   }
 }
-
-function getInput() {}
