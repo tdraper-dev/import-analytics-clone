@@ -19,6 +19,7 @@ const getProjectOutput = async (dir: string, input: Input, repo: Repo) => {
     owner: gitOverride?.owner || git.owner,
     hosting: gitOverride?.hosting || git.hosting,
     username: gitOverride?.username || git.username,
+    password: gitOverride?.password || git.password,
     protocol: gitOverride?.protocol || git.protocol,
   });
 

@@ -52,24 +52,43 @@ export const gitClone = async (
 };
 
 export const gitCloneGithubScript = (options: GitCloneOptions): string => {
-  const { protocol, owner, repoName, repoPath, username, branch } = options;
+  const { protocol, owner, repoName, repoPath, username, password, branch } =
+    options;
 
   if (protocol === "ssh") {
     return `git clone --branch ${branch} git@github.com:${owner}/${repoName}.git ${repoPath}`;
   } else {
-    return `git clone --branch ${branch} https://${username}@github.com/${owner}/${repoName}.git ${repoPath}`;
-    // return `git clone https://github.com/${owner}/${repoName}.git ${repoPath}`;
+    return `git clone --branch ${branch} https://${getCloneCredentials(
+      username,
+      password,
+    )}github.com/${owner}/${repoName}.git ${repoPath}`;
   }
 };
 
 export const gitCloneBitbucketScript = (options: GitCloneOptions): string => {
-  const { protocol, owner, repoName, repoPath, username, branch } = options;
+  const { protocol, owner, repoName, repoPath, username, password, branch } =
+    options;
 
   if (protocol === "ssh") {
     return `git clone --branch ${branch} git@bitbucket.org:${owner}/${repoName}.git ${repoPath}`;
   } else {
-    return `git clone --branch ${branch} https://${username}@bitbucket.org/${owner}/${repoName}.git ${repoPath}`;
-    // return `git clone https://bitbucket.org/${owner}/${repoName}.git ${repoPath}`;
+    return `git clone --branch ${branch} https://${getCloneCredentials(
+      username,
+      password,
+    )}bitbucket.org/${owner}/${repoName}.git ${repoPath}`;
+  }
+};
+
+const getCloneCredentials = (
+  username: GitCloneOptions["username"],
+  password: GitCloneOptions["password"],
+): string => {
+  if (username && password) {
+    return `${username}:${password}@`;
+  } else if (username) {
+    return `${username}@`;
+  } else {
+    return "";
   }
 };
 
