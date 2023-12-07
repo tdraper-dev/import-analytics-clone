@@ -10,10 +10,10 @@ export const getImportRegex = (importPath: string): RegExp => {
 export const getImports = (
   file: string,
   imports: string[],
-  importPath: string
+  library: string
 ) => {
   return (
-    [...file.matchAll(getImportRegex(importPath))]
+    [...file.matchAll(getImportRegex(library))]
       // source: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/matchAll#:~:text=access%20capture%20groups
       // get first instance of matched group (all the import instances)
       .map((matches) => matches[1])

@@ -13,7 +13,9 @@ async function main() {
     throw new Error("input.json not found");
   }
 
-  const input: Input = JSON.parse(readFileSync(__dirname + "/../input.json", "utf8"));
+  const input: Input = JSON.parse(
+    readFileSync(__dirname + "/../input.json", "utf8")
+  );
 
   const output: Output = await getOutput(dir, input);
 
@@ -22,11 +24,15 @@ async function main() {
   const errorCount = getErrors().length;
   const repoCount = Object.keys(input.repos).length;
 
-  console.log(`Repos ${repoCount} Success ${repoCount - errorCount} Errors ${errorCount}`);
-  
+  console.log(
+    `Repos ${repoCount} Success ${repoCount - errorCount} Errors ${errorCount}`
+  );
+
   writeErrorsJson();
 
   if (errorCount) {
-    console.log('Open `errors.json` to view errors');
+    console.log("Open `errors.json` to view errors");
   }
 }
+
+function getInput() {}

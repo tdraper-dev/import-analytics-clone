@@ -1,13 +1,14 @@
 import { join } from "node:path";
 import { readFileSync } from "node:fs";
-import { glob } from "glob";
 import { getImports } from "./get-imports";
+import { getFilePaths } from "./get-file-paths";
 import { gitClone } from "./git-clone";
+import { getDependencies } from "./get-dependencies";
 import { storeError } from "./errors";
 import type { Input, Output, Repo } from "./types";
 
 const getProjectOutput = async (dir: string, input: Input, repo: Repo) => {
-  const { imports, library, git } = input;
+  const { library, dependencies, git } = input;
   const { name: repoName, git: gitOverride } = repo;
 
   const repoPath = join(dir, repoName);
@@ -22,14 +23,14 @@ const getProjectOutput = async (dir: string, input: Input, repo: Repo) => {
     protocol: gitOverride?.protocol || git.protocol,
   });
 
-  const ext = ["ts", "tsx"];
-  const filePaths = await glob(join(repoPath, `/**/*.@(${ext.join("|")})`), {
-    windowsPathsNoEscape: true,
-  });
+  const libraryFiles = await getFilePaths(
+    repoPath,
+    `/**/*.@(${["ts", "tsx"].join("|")})`
+  );
 
-  const matchedImports = filePaths
+  const matchedImports = libraryFiles
     .map((filePath) => readFileSync(filePath, "utf8"))
-    .map((file) => getImports(file, imports, library))
+    .map((file) => getImports(file, library.imports, library.name))
     .flat()
     .reduce((acc, curr) => {
       if (!acc[curr]) acc[curr] = { count: 0 };
@@ -37,42 +38,87 @@ const getProjectOutput = async (dir: string, input: Input, repo: Repo) => {
       return acc;
     }, {});
 
+  const matchedDependencies = await getDependencies(repoPath, dependencies);
+
   cleanup();
 
-  return { matchedImports, importsUsed: Object.keys(matchedImports).length };
+  return {
+    matchedImports,
+    importsUsed: Object.keys(matchedImports).length,
+    matchedDependencies,
+  };
 };
 
 export async function getOutput(dir: string, input: Input): Promise<Output> {
-  const { imports, repos } = input;
+  const { library, repos, dependencies } = input;
 
   const output: Output = {
     metadata: {
       date: new Date().toISOString().split("T")[0],
+    },
+    aggregates: {
       reposThatIncludeImports: [],
       reposThatExcludesImports: [],
+      imports: {},
+      dependencies: {},
     },
     repos: {},
   };
 
   for (const repo of repos) {
     try {
-      const { matchedImports, importsUsed } = await getProjectOutput(
-        dir,
-        input,
-        repo
-      );
+      const { matchedImports, importsUsed, matchedDependencies } =
+        await getProjectOutput(dir, input, repo);
 
       output.repos[repo.name] = {
+        dependencies: matchedDependencies,
         importsUsed,
-        importsNotUsed: imports.length - importsUsed,
+        importsNotUsed: library.imports.length - importsUsed,
         imports: matchedImports,
       };
 
-      if (importsUsed) output.metadata.reposThatIncludeImports.push(repo.name);
-      else output.metadata.reposThatExcludesImports.push(repo.name);
+      if (importsUsed) {
+        output.aggregates.reposThatIncludeImports.push(repo.name);
+      } else {
+        output.aggregates.reposThatExcludesImports.push(repo.name);
+      }
     } catch (error) {
       console.error(error);
       storeError(error);
+    }
+  }
+
+  output.aggregates.dependencies = dependencies
+    ? dependencies.reduce((acc, curr) => {
+        acc[curr] = {
+          repoCount: 0,
+        };
+        return acc;
+      }, {})
+    : {};
+
+  output.aggregates.imports = library.imports.reduce((acc, curr) => {
+    acc[curr] = {
+      instanceCount: 0,
+      repoCount: 0,
+    };
+    return acc;
+  }, {});
+
+  for (const repoName in output.repos) {
+    const repo = output.repos[repoName];
+
+    for (const dependencyName in repo.dependencies) {
+      if (repo.dependencies[dependencyName]) {
+        output.aggregates.dependencies[dependencyName].repoCount += 1;
+      }
+    }
+
+    for (const importName in repo.imports) {
+      const importCount = repo.imports[importName].count;
+
+      output.aggregates.imports[importName].instanceCount += importCount;
+      output.aggregates.imports[importName].repoCount += 1;
     }
   }
 

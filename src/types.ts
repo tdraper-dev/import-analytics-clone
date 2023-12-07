@@ -7,13 +7,8 @@ export interface GitOptions {
 }
 
 export interface GitCloneOptions extends GitOptions {
-  // hosting: 'bitbucket' | 'github';
-  // protocol: 'ssh' | 'https';
   repoName: string;
   repoPath: string;
-  // owner: string;
-  // username: string;
-  // branch: string;
 }
 
 export interface Repo {
@@ -22,8 +17,11 @@ export interface Repo {
 }
 
 export interface Input {
-  imports: string[];
-  library: string;
+  library: {
+    name: string;
+    imports: string[];
+  };
+  dependencies?: string[];
   repos: Array<Repo>;
   git: GitOptions;
 }
@@ -31,11 +29,25 @@ export interface Input {
 export interface Output {
   metadata: {
     date: string;
+  };
+  aggregates: {
     reposThatIncludeImports: string[];
     reposThatExcludesImports: string[];
+    imports: {
+      [importName: string]: {
+        instanceCount: number;
+        repoCount: number;
+      };
+    };
+    dependencies: {
+      [dependencyName: string]: {
+        repoCount: number;
+      };
+    };
   };
   repos: {
     [repoName: string]: {
+      dependencies: Record<string, boolean>;
       importsUsed: number;
       importsNotUsed: number;
       imports: Record<string, { count: number }>;
