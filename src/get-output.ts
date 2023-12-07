@@ -1,9 +1,8 @@
 import { join } from "node:path";
-import { readFileSync } from "node:fs";
 import { getImports } from "./get-imports";
-import { getFilePaths } from "./get-file-paths";
 import { gitClone } from "./git-clone";
 import { getDependencies } from "./get-dependencies";
+import { calculateAggregates } from "./calculate-aggregates";
 import { storeError } from "./errors";
 import type { Input, Output, Repo } from "./types";
 
@@ -23,20 +22,7 @@ const getProjectOutput = async (dir: string, input: Input, repo: Repo) => {
     protocol: gitOverride?.protocol || git.protocol,
   });
 
-  const libraryFiles = await getFilePaths(
-    repoPath,
-    `/**/*.@(${["ts", "tsx"].join("|")})`,
-  );
-
-  const matchedImports = libraryFiles
-    .map((filePath) => readFileSync(filePath, "utf8"))
-    .map((file) => getImports(file, library.imports, library.name))
-    .flat()
-    .reduce((acc, curr) => {
-      if (!acc[curr]) acc[curr] = { count: 0 };
-      acc[curr].count += 1;
-      return acc;
-    }, {});
+  const matchedImports = await getImports(repoPath, library);
 
   const matchedDependencies = await getDependencies(repoPath, dependencies);
 
@@ -88,39 +74,14 @@ export async function getOutput(dir: string, input: Input): Promise<Output> {
     }
   }
 
-  output.aggregates.dependencies = dependencies
-    ? dependencies.reduce((acc, curr) => {
-        acc[curr] = {
-          repoCount: 0,
-        };
-        return acc;
-      }, {})
-    : {};
+  const aggregates = calculateAggregates(
+    output.repos,
+    library.imports,
+    dependencies,
+  );
 
-  output.aggregates.imports = library.imports.reduce((acc, curr) => {
-    acc[curr] = {
-      instanceCount: 0,
-      repoCount: 0,
-    };
-    return acc;
-  }, {});
-
-  for (const repoName in output.repos) {
-    const repo = output.repos[repoName];
-
-    for (const dependencyName in repo.dependencies) {
-      if (repo.dependencies[dependencyName]) {
-        output.aggregates.dependencies[dependencyName].repoCount += 1;
-      }
-    }
-
-    for (const importName in repo.imports) {
-      const importCount = repo.imports[importName].count;
-
-      output.aggregates.imports[importName].instanceCount += importCount;
-      output.aggregates.imports[importName].repoCount += 1;
-    }
-  }
+  output.aggregates.dependencies = aggregates.dependencies;
+  output.aggregates.imports = aggregates.imports;
 
   return output;
 }
