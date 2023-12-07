@@ -7,13 +7,8 @@ export interface GitOptions {
 }
 
 export interface GitCloneOptions extends GitOptions {
-  // hosting: 'bitbucket' | 'github';
-  // protocol: 'ssh' | 'https';
   repoName: string;
   repoPath: string;
-  // owner: string;
-  // username: string;
-  // branch: string;
 }
 
 export interface Repo {
