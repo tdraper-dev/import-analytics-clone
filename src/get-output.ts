@@ -25,7 +25,7 @@ const getProjectOutput = async (dir: string, input: Input, repo: Repo) => {
 
   const libraryFiles = await getFilePaths(
     repoPath,
-    `/**/*.@(${["ts", "tsx"].join("|")})`
+    `/**/*.@(${["ts", "tsx"].join("|")})`,
   );
 
   const matchedImports = libraryFiles

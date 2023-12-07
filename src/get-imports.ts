@@ -3,14 +3,14 @@ export const getImportRegex = (importPath: string): RegExp => {
   // return new RegExp(`import\\s+{([\\s,\\S]+?)}\\s+from\\s+[',"]${importPath}[',"]`, 'g');
   return new RegExp(
     `import\\s+{([^}]+?)}\\s+from\\s+[',"]${importPath}[',"]`,
-    "g"
+    "g",
   );
 };
 
 export const getImports = (
   file: string,
   imports: string[],
-  library: string
+  library: string,
 ) => {
   return (
     [...file.matchAll(getImportRegex(library))]
@@ -24,7 +24,7 @@ export const getImports = (
           // remove white space
           .map((importInstance) => importInstance.trim())
           // grab only the imports we care about
-          .filter((importInstance) => imports.includes(importInstance))
+          .filter((importInstance) => imports.includes(importInstance)),
       )
       // combine all matches into one array
       .flat()

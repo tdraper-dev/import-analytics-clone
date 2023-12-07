@@ -9,4 +9,4 @@ export const getTempDir = () => {
   return mkdtempSync(`${tmpDir}${sep}`);
   // Local directory (for debugging)
   // return join(__dirname, "../temp");
-}
+};
