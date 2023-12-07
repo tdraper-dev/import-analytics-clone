@@ -1,6 +1,7 @@
 import shell from "shelljs";
 import { rmSync } from "node:fs";
 import { GitCloneOptions } from './types';
+import { getErrorMessage } from "./errors";
 
 // Attempt to clean up if process exits for any reason
 process.on('exit', () => {
@@ -28,16 +29,21 @@ export const gitClone = async (options: GitCloneOptions): Promise<() => void> =>
 
     const execScript = hosting === 'github' ? gitCloneGithubScript(options) : gitCloneBitbucketScript(options);
 
-    await execAsync(execScript);
+    try {
+        await execAsync(execScript);
 
-    const cleanup = () => {
-        cleanupMap[repoName] = null;
-        delete cleanupMap[repoName];
-        rmSync(repoPath, { recursive: true, force: true })
-    };
-
-    cleanupMap[repoName] = cleanup;
-    return cleanup;
+        const cleanup = () => {
+            cleanupMap[repoName] = null;
+            delete cleanupMap[repoName];
+            rmSync(repoPath, { recursive: true, force: true })
+        };
+    
+        cleanupMap[repoName] = cleanup;
+        return cleanup;
+    } catch (error) {
+        const message = `${execScript}\n${getErrorMessage(error)}`;
+        throw new Error(message);
+    }
 };
 
 export const gitCloneGithubScript = (options: GitCloneOptions): string => {

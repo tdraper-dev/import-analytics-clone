@@ -11,11 +11,13 @@ export const storeError = (error: unknown) => {
 }
 
 export const writeErrorsJson = () => {
-    writeFileSync(__dirname + "/../errors.json", JSON.stringify(errors.map(error => {
-        if (error instanceof Error) {
-            return error.message;
-        }
+    writeFileSync(__dirname + "/../errors.json", JSON.stringify(errors.map(getErrorMessage), null, 2));
+}
 
-        return error;
-    }), null, 2));
+export const getErrorMessage = (error: unknown): string => {
+    if (error instanceof Error) {
+        return error.message;
+    }
+
+    return '' + error;
 }
