@@ -1,0 +1,37 @@
+{
+    "imports": [
+        "NgModule",
+        "Component",
+        "ComponentFactory",
+        "ViewContainerRef"
+    ],
+    "library": "@angular/core",
+    "repos": [
+        {
+            "name": "eslint-plugin",
+            "git": {
+                "hosting": "github",
+                "protocol": "https",
+                "owner": "bitovi"
+            }
+        },
+        {
+            "name": "academy"
+        },
+        {
+            "name": "opensource-analytics-dashboard",
+            "git": {
+                "hosting": "github",
+                "protocol": "https",
+                "owner": "bitovi"
+            }
+        }
+    ],
+    "git": {
+        "username": "m-thompson-code",
+        "hosting": "github",
+        "protocol": "https",
+        "branch": "main",
+        "owner": "bitovi"
+    }
+}

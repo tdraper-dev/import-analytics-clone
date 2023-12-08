@@ -1,3 +1,5 @@
+const MATCH_AS_KEYWORD_IMPORT = /(\S+?)\s+?as/;
+
 // source: https://regexr.com/7oh1p
 export const getImportRegex = (importPath: string): RegExp => {
   // return new RegExp(`import\\s+{([\\s,\\S]+?)}\\s+from\\s+[',"]${importPath}[',"]`, 'g');
@@ -23,6 +25,17 @@ export const getImports = (
           .split(",")
           // remove white space
           .map((importInstance) => importInstance.trim())
+          // Handle import instances that use `as` keywords
+          .map((importInstance) => {
+            // Check for `as` keyword
+            const importUsingAsKeyword = importInstance.match(MATCH_AS_KEYWORD_IMPORT)?.[1];
+
+            if (importUsingAsKeyword) {
+              return importUsingAsKeyword;
+            }
+            
+            return importInstance;
+          })
           // grab only the imports we care about
           .filter((importInstance) => imports.includes(importInstance))
       )
@@ -30,6 +43,7 @@ export const getImports = (
       .flat()
       // remove empty "instances" (when import uses trailing comma)
       .filter((importInstance) => !!importInstance)
+      
   );
   // // remove commented out instances
   // .filter(importInstance => !importInstance.startsWith('/'));
