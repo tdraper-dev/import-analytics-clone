@@ -17,8 +17,6 @@ export interface Repo {
   git?: Partial<GitOptions>;
 }
 
-// temp
-
 export interface Input {
   /**
    * Check repos for imports from library.
