@@ -1,7 +1,7 @@
 import shell from "shelljs";
 import { rmSync } from "node:fs";
 import { GitCloneOptions } from "./types";
-import { getErrorMessage } from "./errors";
+import { getErrorMessage, storeError } from "./errors";
 
 // Attempt to clean up if process exits for any reason
 process.on("exit", () => {
@@ -111,6 +111,7 @@ export const getLastCommitDate = async (repoPath: string): Promise<string> => {
 
     return stdout.trim();
   } catch (error) {
-    return Promise.reject("failed to get last commit date");
+    storeError(error.message);
+    return Promise.resolve("");
   }
 };
