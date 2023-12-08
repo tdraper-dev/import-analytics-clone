@@ -18,12 +18,34 @@ export interface Repo {
 }
 
 export interface Input {
+  /**
+   * Check repos for imports from library.
+   */
   library: {
+    /**
+     * Name of library:
+     *
+     * ```ts
+     * import { SomeImport } from 'name-of-library';
+     * ```
+     */
     name: string;
+    /**
+     * List of imports to check for.
+     */
     imports: string[];
   };
+  /**
+   * Check repo for dependencies found in package.json (Optional).
+   */
   dependencies?: string[];
-  repos: Array<Repo>;
+  /**
+   * List of repos to check against and git options for each repo.
+   */
+  repos: Repo[];
+  /**
+   * Default git options that apply to all repos. These options can be overridden.
+   */
   git: GitOptions;
 }
 
