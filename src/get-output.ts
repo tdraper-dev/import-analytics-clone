@@ -1,12 +1,21 @@
 import { join } from "node:path";
 import { getImports } from "./get-imports";
-import { gitClone } from "./git-clone";
+import { gitClone, getLastCommitDate } from "./git-clone";
 import { getDependencies } from "./get-dependencies";
 import { calculateAggregates } from "./calculate-aggregates";
 import { storeError } from "./errors";
 import type { Input, Output, Repo } from "./types";
 
-const getProjectOutput = async (dir: string, input: Input, repo: Repo) => {
+const getProjectOutput = async (
+  dir: string,
+  input: Input,
+  repo: Repo,
+): Promise<{
+  matchedImports: Output["repos"][string]["imports"];
+  importsUsed: Output["repos"][string]["importsUsed"];
+  matchedDependencies: Output["repos"][string]["dependencies"];
+  lastCommitDate: Output["repos"][string]["lastCommitDate"];
+}> => {
   const { library, dependencies, git } = input;
   const { name: repoName, git: gitOverride } = repo;
 
@@ -24,8 +33,8 @@ const getProjectOutput = async (dir: string, input: Input, repo: Repo) => {
   });
 
   const matchedImports = await getImports(repoPath, library);
-
   const matchedDependencies = await getDependencies(repoPath, dependencies);
+  const lastCommitDate = await getLastCommitDate(repoPath);
 
   cleanup();
 
@@ -33,6 +42,7 @@ const getProjectOutput = async (dir: string, input: Input, repo: Repo) => {
     matchedImports,
     importsUsed: Object.keys(matchedImports).length,
     matchedDependencies,
+    lastCommitDate,
   };
 };
 
@@ -54,14 +64,19 @@ export async function getOutput(dir: string, input: Input): Promise<Output> {
 
   for (const repo of repos) {
     try {
-      const { matchedImports, importsUsed, matchedDependencies } =
-        await getProjectOutput(dir, input, repo);
+      const {
+        matchedImports,
+        importsUsed,
+        matchedDependencies,
+        lastCommitDate,
+      } = await getProjectOutput(dir, input, repo);
 
       output.repos[repo.name] = {
         dependencies: matchedDependencies,
         importsUsed,
         importsNotUsed: library.imports.length - importsUsed,
         imports: matchedImports,
+        lastCommitDate,
       };
 
       if (importsUsed) {

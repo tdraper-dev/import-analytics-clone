@@ -10,7 +10,7 @@ process.on("exit", () => {
 
 const cleanupMap: Record<string, () => void> = {};
 
-function execAsync(cmd: string, opts: shell.ExecOptions = {}) {
+function execAsync(cmd: string, opts: shell.ExecOptions = {}): Promise<string> {
   return new Promise(function (resolve, reject) {
     // Execute the command, reject if we exit non-zero (i.e. error)
     shell.exec(cmd, opts, function (code, stdout, stderr) {
@@ -98,4 +98,19 @@ export const cleanupAll = (): void => {
     delete cleanupMap[repoName];
     cleanup();
   });
+};
+
+export const getLastCommitDate = async (repoPath: string): Promise<string> => {
+  try {
+    const stdout = await execAsync(
+      `git log -1 --format=%cd --date=format:'%Y-%m-%d'`,
+      {
+        cwd: repoPath,
+      },
+    );
+
+    return stdout.trim();
+  } catch (error) {
+    return Promise.reject("failed to get last commit date");
+  }
 };

@@ -52,6 +52,7 @@ export interface Output {
       importsUsed: number;
       importsNotUsed: number;
       imports: Record<string, { count: number }>;
+      lastCommitDate: string;
     };
   };
 }
