@@ -1,13 +1,13 @@
 import { join } from "node:path";
-import { readFileSync } from "node:fs";
-import { glob } from "glob";
 import { getImports } from "./get-imports";
 import { gitClone } from "./git-clone";
+import { getDependencies } from "./get-dependencies";
+import { calculateAggregates } from "./calculate-aggregates";
 import { storeError } from "./errors";
 import type { Input, Output, Repo } from "./types";
 
 const getProjectOutput = async (dir: string, input: Input, repo: Repo) => {
-  const { imports, library, git } = input;
+  const { library, dependencies, git } = input;
   const { name: repoName, git: gitOverride } = repo;
 
   const repoPath = join(dir, repoName);
@@ -19,62 +19,70 @@ const getProjectOutput = async (dir: string, input: Input, repo: Repo) => {
     owner: gitOverride?.owner || git.owner,
     hosting: gitOverride?.hosting || git.hosting,
     username: gitOverride?.username || git.username,
+    password: gitOverride?.password || git.password,
     protocol: gitOverride?.protocol || git.protocol,
   });
 
-  const ext = ["ts", "tsx"];
-  const filePaths = await glob(join(repoPath, `/**/*.@(${ext.join("|")})`), {
-    windowsPathsNoEscape: true,
-  });
+  const matchedImports = await getImports(repoPath, library);
 
-  const matchedImports = filePaths
-    .map((filePath) => readFileSync(filePath, "utf8"))
-    .map((file) => getImports(file, imports, library))
-    .flat()
-    .reduce((acc, curr) => {
-      if (!acc[curr]) acc[curr] = { count: 0 };
-      acc[curr].count += 1;
-      return acc;
-    }, {});
+  const matchedDependencies = await getDependencies(repoPath, dependencies);
 
   cleanup();
 
-  return { matchedImports, importsUsed: Object.keys(matchedImports).length };
+  return {
+    matchedImports,
+    importsUsed: Object.keys(matchedImports).length,
+    matchedDependencies,
+  };
 };
 
 export async function getOutput(dir: string, input: Input): Promise<Output> {
-  const { imports, repos } = input;
+  const { library, repos, dependencies } = input;
 
   const output: Output = {
     metadata: {
       date: new Date().toISOString().split("T")[0],
+    },
+    aggregates: {
       reposThatIncludeImports: [],
       reposThatExcludesImports: [],
+      imports: {},
+      dependencies: {},
     },
     repos: {},
   };
 
   for (const repo of repos) {
     try {
-      const { matchedImports, importsUsed } = await getProjectOutput(
-        dir,
-        input,
-        repo
-      );
+      const { matchedImports, importsUsed, matchedDependencies } =
+        await getProjectOutput(dir, input, repo);
 
       output.repos[repo.name] = {
+        dependencies: matchedDependencies,
         importsUsed,
-        importsNotUsed: imports.length - importsUsed,
+        importsNotUsed: library.imports.length - importsUsed,
         imports: matchedImports,
       };
 
-      if (importsUsed) output.metadata.reposThatIncludeImports.push(repo.name);
-      else output.metadata.reposThatExcludesImports.push(repo.name);
+      if (importsUsed) {
+        output.aggregates.reposThatIncludeImports.push(repo.name);
+      } else {
+        output.aggregates.reposThatExcludesImports.push(repo.name);
+      }
     } catch (error) {
       console.error(error);
       storeError(error);
     }
   }
+
+  const aggregates = calculateAggregates(
+    output.repos,
+    library.imports,
+    dependencies,
+  );
+
+  output.aggregates.dependencies = aggregates.dependencies;
+  output.aggregates.imports = aggregates.imports;
 
   return output;
 }

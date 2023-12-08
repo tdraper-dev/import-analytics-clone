@@ -1,0 +1,9 @@
+# Ignore artifacts:
+node_modules
+temp
+dist
+.git
+package-lock.json
+errors.json
+input.json
+output.json
