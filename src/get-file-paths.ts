@@ -7,5 +7,6 @@ export async function getFilePaths(
 ): Promise<string[]> {
   return await glob(join(repoPath, wildcard), {
     windowsPathsNoEscape: true,
+    nodir: true,
   });
 }
