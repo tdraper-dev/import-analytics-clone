@@ -90,10 +90,23 @@ runs:
               name: ${{ steps.repo-basename.outputs.value }}
             }],
             git: {
-              owner: ${{ github.repository.owner }}
+              owner: ${{ github.repository_owner }}
               protocol: ${{ inputs.protocol }}
               hosting: ${{ inputs.hosting }}
               branch: ${{ inputs.branch }}
             }
           }
-        " > "${GITHUB_ACTION_PATH}/input.json"
+        " > "./input.json"
+
+    - name: setup git config
+      shell: bash
+      run: |
+        git config user.name "GitHub Actions Bot"
+        git config user.email "<>"
+
+    - name: commit
+      shell: bash
+      run: |
+        git add input.json
+        git commit -m "added input.json"
+        git push origin main
