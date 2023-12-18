@@ -1,0 +1,22 @@
+name: "Test"
+
+on:
+  push:
+    branches:
+      - "main"
+      - "dev"
+
+permissions:
+  actions: write
+  contents: read
+  id-token: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: The only step
+        uses: "../action.yaml"
+        with:
+          library: "node:fs"
+          imports: "readFileSync"
