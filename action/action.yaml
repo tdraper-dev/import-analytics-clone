@@ -41,7 +41,7 @@ runs:
   using: "composite"
   steps:
     - name: "Checkout if required"
-      if: ${{ inputs.checkout === 'true'}}
+      if: ${{ inputs.checkout == 'true'}}
       uses: actions/checkout@v3
 
     # - name: create-json
@@ -90,7 +90,7 @@ runs:
               name: ${{ steps.repo-basename.outputs.value }}
             }],
             git: {
-              owner: ${{ GITHUB_REPOSITORY_OWNER }}
+              owner: ${{ github.repository.owner }}
               protocol: ${{ inputs.protocol }}
               hosting: ${{ inputs.hosting }}
               branch: ${{ inputs.branch }}
