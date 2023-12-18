@@ -79,21 +79,20 @@ runs:
       shell: bash
       run: |
         echo "value=`basename ${{ github.repository }}`" >> $GITHUB_OUTPUT
-        echo 
-        "
+        echo "
           {
             "library": {
-              name: ${{ inputs.library }},
-              imports: ${{ inputs.imports }}
+              "name": ${{ inputs.library }},
+              "imports": ${{ inputs.imports }}
             },
-            repos: [{
-              name: ${{ steps.repo-basename.outputs.value }}
+            "repos": [{
+              "name": ${{ steps.repo-basename.outputs.value }}
             }],
-            git: {
-              owner: ${{ github.repository_owner }}
-              protocol: ${{ inputs.protocol }}
-              hosting: ${{ inputs.hosting }}
-              branch: ${{ inputs.branch }}
+            "git": {
+              "owner": ${{ github.repository_owner }}
+              "protocol": ${{ inputs.protocol }}
+              "hosting": ${{ inputs.hosting }}
+              "branch": ${{ inputs.branch }}
             }
           }
         " > "./input.json"
