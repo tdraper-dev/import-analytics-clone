@@ -17,7 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Testing
-        uses: "/"
+        uses: "/action"
         with:
           library: "node:fs"
           imports: "readFileSync"
