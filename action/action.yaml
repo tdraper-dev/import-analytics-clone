@@ -80,7 +80,7 @@ runs:
       run: |
         echo "value=`basename ${{ github.repository }}`" >> $GITHUB_OUTPUT
         echo "
-          {
+          toJson({
             "library": {
               "name": ${{ inputs.library }},
               "imports": ${{ inputs.imports }}
@@ -94,7 +94,7 @@ runs:
               "hosting": ${{ inputs.hosting }}
               "branch": ${{ inputs.branch }}
             }
-          }
+          })
         " > "./input.json"
 
     - name: setup git config
