@@ -96,16 +96,17 @@ runs:
             }
           })
         " > "./input.json"
+        cat "./input.json"
 
-    - name: setup git config
-      shell: bash
-      run: |
-        git config user.name ${{ github.pusher.name }}
-        git config user.email ${{ github.pusher.email }}
+    # - name: setup git config
+    #   shell: bash
+    #   run: |
+    #     git config user.name ${{ github.pusher.name }}
+    #     git config user.email ${{ github.pusher.email }}
 
-    - name: commit
-      shell: bash
-      run: |
-        git add input.json
-        git commit -m "added input.json"
-        git push origin main
+    # - name: commit
+    #   shell: bash
+    #   run: |
+    #     git add input.json
+    #     git commit -m "added input.json"
+    #     git push origin main
