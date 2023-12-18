@@ -79,8 +79,8 @@ runs:
       shell: bash
       run: |
         echo "value=`basename ${{ github.repository }}`" >> $GITHUB_OUTPUT
-        echo |
-        '
+        echo 
+        "
           {
             "library": {
               name: ${{ inputs.library }},
@@ -96,4 +96,4 @@ runs:
               branch: ${{ inputs.branch }}
             }
           }
-        ' > "${GITHUB_ACTION_PATH}/input.json"
+        " > "${GITHUB_ACTION_PATH}/input.json"
