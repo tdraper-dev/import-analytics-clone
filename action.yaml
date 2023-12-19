@@ -41,6 +41,7 @@ runs:
       shell: bash
       run: |
         echo "value=`basename ${{ github.repository }}`" >> $GITHUB_OUTPUT
+        echo "::add-mask::${{ secrets.ACTION_TOKEN }}"
         echo '
           {
             "library": {
@@ -51,6 +52,8 @@ runs:
               "name": "${{ steps.repo-basename.outputs.value }}"
             }],
             "git": {
+              "username": "${{ secrets.ACTION_USERNAME }}"
+              "password": "${{ secrets.ACTION_TOKEN }}"
               "owner": "${{ github.repository_owner }}",
               "protocol": "${{ inputs.protocol }}",
               "hosting": "${{ inputs.hosting }}",
@@ -58,7 +61,6 @@ runs:
             }
           }
         ' > "${GITHUB_ACTION_PATH}/input.json"
-        cat "${GITHUB_ACTION_PATH}/input.json"
 
     - name: ⎔ Setup node
       uses: actions/setup-node@v3
