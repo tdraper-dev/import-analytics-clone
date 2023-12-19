@@ -11,8 +11,6 @@ async function main() {
         throw new Error("input.json not found");
     }
     const input = JSON.parse((0, node_fs_1.readFileSync)(__dirname + "/../input.json", "utf8"));
-    console.log("INPUT", input);
-    console.warn("INPUT", input);
     const output = await (0, get_output_1.getOutput)(dir, input);
     (0, node_fs_1.writeFileSync)(__dirname + "/../output.json", JSON.stringify(output, null, 2));
     const errorCount = (0, errors_1.getErrors)().length;

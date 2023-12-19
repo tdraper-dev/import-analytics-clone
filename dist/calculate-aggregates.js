@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.calculateAggregates = void 0;
 function calculateAggregates(repos, imports, dependencies) {
-    console.debug("IMPORTS ---> ", imports);
     const aggregates = {
         dependencies: dependencies
             ? dependencies.reduce((acc, curr) => {

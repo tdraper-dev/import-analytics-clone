@@ -112,6 +112,10 @@ runs:
       shell: bash
       run: npm install && node ${GITHUB_ACTION_PATH}/dist/index.js
 
+    - name: Print final output
+      shell: bash
+      run: cat './output.json'
+
     # - name: setup git config
     #   shell: bash
     #   run: |

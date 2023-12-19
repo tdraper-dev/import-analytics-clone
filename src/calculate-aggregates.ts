@@ -5,7 +5,6 @@ export function calculateAggregates(
   imports: Input["library"]["imports"],
   dependencies: Input["dependencies"],
 ): Pick<Output["aggregates"], "imports" | "dependencies"> {
-  console.debug("IMPORTS ---> ", imports);
   const aggregates = {
     dependencies: dependencies
       ? dependencies.reduce((acc, curr) => {
