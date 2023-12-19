@@ -16,7 +16,8 @@ async function main() {
   const input: Input = JSON.parse(
     readFileSync(__dirname + "/../input.json", "utf8"),
   );
-
+  console.log("INPUT", input);
+  console.warn("INPUT", input);
   const output: Output = await getOutput(dir, input);
 
   writeFileSync(__dirname + "/../output.json", JSON.stringify(output, null, 2));
