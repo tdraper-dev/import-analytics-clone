@@ -10,7 +10,7 @@ inputs:
     description: "Name of library whose component instance we will count"
     required: true
   imports:
-    description: "Name of component who instances we will count"
+    description: "Names components whose instances we will count, please pass as a stringified array"
     required: true
   hosting:
     description: "Hosting service"
@@ -52,7 +52,7 @@ runs:
           {
             "library": {
               "name": "${{ inputs.library }}",
-              "imports": ["${{ inputs.imports }}"]
+              "imports": ${{ inputs.imports }}
             },
             "repos": [{
               "name": "${{ steps.repo-basename.outputs.value }}"
