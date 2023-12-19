@@ -103,14 +103,14 @@ runs:
       with:
         node-version: 18
 
-    - name: 📥 Download deps
-      uses: bahmutov/npm-install@v1
-      with:
-        useLockFile: false
+    # - name: 📥 Download deps
+    #   uses: bahmutov/npm-install@v1
+    #   with:
+    #     useLockFile: false
 
     - name: Run Primary script
       shell: bash
-      run: node ${GITHUB_ACTION_PATH}/dist/index.js
+      run: npm install && node ${GITHUB_ACTION_PATH}/dist/index.js
 
     # - name: setup git config
     #   shell: bash
