@@ -57,8 +57,8 @@ runs:
               "branch": "${{ inputs.branch }}"
             }
           }
-        ' > "./input.json"
-        cat "./input.json"
+        ' > "${GITHUB_ACTION_PATH}/input.json"
+        cat "${GITHUB_ACTION_PATH}/input.json"
 
     - name: ⎔ Setup node
       uses: actions/setup-node@v3
