@@ -24,6 +24,13 @@ inputs:
     description: "Branch off of which to read import count"
     required: false
     default: "main"
+  password_token:
+    description: "Password for cloning into repo"
+    required: true
+  username:
+    description: "Username for cloning into repo"
+    required: false
+    default: ${{ github.repository_owner }}
 
 runs:
   using: "composite"
@@ -52,8 +59,8 @@ runs:
               "name": "${{ steps.repo-basename.outputs.value }}"
             }],
             "git": {
-              "username": "${{ secrets.ACTION_USERNAME }}"
-              "password": "${{ secrets.ACTION_TOKEN }}"
+              "username": "${{ inputs.username }}"
+              "password": "${{ inputs.password_token }}"
               "owner": "${{ github.repository_owner }}",
               "protocol": "${{ inputs.protocol }}",
               "hosting": "${{ inputs.hosting }}",
