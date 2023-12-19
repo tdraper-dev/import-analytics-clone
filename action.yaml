@@ -79,4 +79,4 @@ runs:
 
     - name: Print final output
       shell: bash
-      run: cat '${GITHUB_ACTION_PATH}/output.json'
+      run: cat "${GITHUB_ACTION_PATH}/output.json"
