@@ -89,7 +89,7 @@ export async function getOutput(dir: string, input: Input): Promise<Output> {
       storeError(error);
     }
   }
-  console.log("LIBRARY", library);
+
   const aggregates = calculateAggregates(
     output.repos,
     library.imports,

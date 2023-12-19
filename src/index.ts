@@ -24,9 +24,6 @@ async function main() {
   const errorCount = getErrors().length;
   const repoCount = Object.keys(input.repos).length;
 
-  const test = JSON.stringify(output);
-
-  console.log("CHECK CHECK", test);
   console.log(
     `Repos ${repoCount} Success ${repoCount - errorCount} Errors ${errorCount}`,
   );
