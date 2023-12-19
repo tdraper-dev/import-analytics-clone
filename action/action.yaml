@@ -98,6 +98,15 @@ runs:
         ' > "./input.json"
         cat "./input.json"
 
+    - name: ⎔ Setup node
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+
+    - name: Run Primary script
+      shell: bash
+      run: node ${GITHUB_ACTION_PATH}/dist/index.js
+
     # - name: setup git config
     #   shell: bash
     #   run: |
