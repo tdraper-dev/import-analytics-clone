@@ -83,7 +83,7 @@ runs:
           {
             "library": {
               "name": "${{ inputs.library }}",
-              "imports": "["${{ inputs.imports }}"]"
+              "imports": "[${{ inputs.imports }}]"
             },
             "repos": [{
               "name": "${{ steps.repo-basename.outputs.value }}"
