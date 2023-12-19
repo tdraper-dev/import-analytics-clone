@@ -48,7 +48,6 @@ runs:
       shell: bash
       run: |
         echo "value=`basename ${{ github.repository }}`" >> $GITHUB_OUTPUT
-        echo "::add-mask::${{ secrets.ACTION_TOKEN }}"
         echo '
           {
             "library": {
