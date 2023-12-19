@@ -1,4 +1,4 @@
-name: "Bitovi-Test Component Import Count"
+name: "A Test Component Import Count"
 description: "Count component import instances"
 
 inputs:
