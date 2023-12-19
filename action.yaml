@@ -1,15 +1,5 @@
-name: "Component Import Count"
-description:
-  "Count component import instances"
-
-  # npm install a specific package.json for this yaml
-  # build local input.json
-  #     checkout generate scripts in common
-  #     echo into some local file -- " > "${GITHUB_ACTION_PATH}/operations/deployment/terraform/aws/terraform.tfvars"
-  # execute main script
-#     various user inputs
-# Search Github Applications
-# Automatic variable for Github workspace
+name: "Bitovi-Test Component Import Count"
+description: "Count component import instances"
 
 inputs:
   checkout:
@@ -34,8 +24,6 @@ inputs:
     description: "Branch off of which to read import count"
     required: false
     default: "main"
-# output:
-# Determine how to output component instance count for any sort of pipeline testing
 
 runs:
   using: "composite"
@@ -44,36 +32,10 @@ runs:
       if: ${{ inputs.checkout == 'true'}}
       uses: actions/checkout@v3
 
-    # - name: create-json
-    #   id: create-json
-    #   uses: jsdaniell/create-json@v1.2.2
-    #   with:
-    #     name: "input.json"
-    #     json: '"library":{"name":"${{ inputs.library }}", "imports":"[{{ inputs.imports }}]"}'
-    #     dir: "${GITHUB_ACTION_PATH}/"
-
     - id: "repo-basename"
       run: |
         echo "value=`basename ${{ github.repository }}`" >> $GITHUB_OUTPUT
       shell: bash
-    # - name: "Write YAML file"
-    #   shell: bash
-    #   run: cd ${{ GITHUB_ACTION_PATH }}
-    #     echo '{"library":"name":"${{ inputs.library}}"}' > "${GITHUB_ACTION_PATH}/input_initial.json"
-
-    # - name: 'Write JSON file'
-    #   uses: mikefarah/yq@master
-    #   with:
-    #     cmd yq r --prettyPrint -j \
-
-    # cd ${{ GITHUB_ACTION_PATH }}
-    # npm install
-
-    # - name: Dump github context
-    #   run: echo "$GITHUB_CONTEXT"
-    #   shell: bash
-    #   env:
-    #     GITHUB_CONTEXT: ${{ toJson(github) }}
 
     - name: "Write JSON File"
       shell: bash
@@ -103,11 +65,6 @@ runs:
       with:
         node-version: 18
 
-    # - name: 📥 Download deps
-    #   uses: bahmutov/npm-install@v1
-    #   with:
-    #     useLockFile: false
-
     - name: Run Primary script
       shell: bash
       run: npm install && node ${GITHUB_ACTION_PATH}/dist/index.js
@@ -115,16 +72,3 @@ runs:
     - name: Print final output
       shell: bash
       run: cat './output.json'
-
-    # - name: setup git config
-    #   shell: bash
-    #   run: |
-    #     git config user.name ${{ github.pusher.name }}
-    #     git config user.email ${{ github.pusher.email }}
-
-    # - name: commit
-    #   shell: bash
-    #   run: |
-    #     git add input.json
-    #     git commit -m "added input.json"
-    #     git push origin main
