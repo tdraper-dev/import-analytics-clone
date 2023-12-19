@@ -67,7 +67,7 @@ runs:
 
     - name: Run Primary script
       shell: bash
-      run: npm install && node ${GITHUB_ACTION_PATH}/dist/index.js
+      run: npm install && npm run build && node ${GITHUB_ACTION_PATH}/dist/index.js
 
     - name: Print final output
       shell: bash
