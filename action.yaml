@@ -82,5 +82,5 @@ runs:
       run: |
         echo "Results:"
         cat "${GITHUB_ACTION_PATH}/output.json"
-        echo "Errors:"
+        echo -e "\nErrors:"
         cat "${GITHUB_ACTION_PATH}/errors.json"
