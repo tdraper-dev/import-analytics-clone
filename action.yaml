@@ -80,5 +80,7 @@ runs:
     - name: Print final output
       shell: bash
       run: |
+        echo "Results:"
         cat "${GITHUB_ACTION_PATH}/output.json"
+        echo "Errors:"
         cat "${GITHUB_ACTION_PATH}/errors.json"
