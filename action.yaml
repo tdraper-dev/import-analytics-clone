@@ -53,7 +53,7 @@ runs:
         echo "value=`basename ${{ github.repository }}`" >> $GITHUB_OUTPUT
         echo '
           {
-            "api_path": "${{ inputs.api_path }}"
+            "api_path": "${{ inputs.api_path }}",
             "library": {
               "name": "${{ inputs.library }}",
               "imports": ${{ inputs.imports }}
