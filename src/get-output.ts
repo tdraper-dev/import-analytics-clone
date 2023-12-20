@@ -50,6 +50,7 @@ export async function getOutput(dir: string, input: Input): Promise<Output> {
   const { library, repos, dependencies } = input;
 
   const output: Output = {
+    library: library.name,
     metadata: {
       date: new Date().toISOString().split("T")[0],
     },

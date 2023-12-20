@@ -58,6 +58,7 @@ export interface Input {
 }
 
 export interface Output {
+  library: Input["library"]["name"];
   metadata: {
     date: string;
   };
