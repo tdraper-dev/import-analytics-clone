@@ -34,6 +34,9 @@ inputs:
   api_path:
     description: "Endpoint to which output data will be sent, if provided"
     required: false
+  api_key:
+    description: "Unique indentifier to tag outgoing records in database"
+    required: false
 
 runs:
   using: "composite"
