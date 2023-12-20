@@ -19,6 +19,10 @@ export interface Repo {
 
 export interface Input {
   /**
+   * The API endpoint to which the resultant data will be sent
+   */
+  api_path?: string;
+  /**
    * Check repos for imports from library.
    */
   library: {

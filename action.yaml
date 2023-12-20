@@ -31,6 +31,9 @@ inputs:
     description: "Username for cloning into repo"
     required: false
     default: ${{ github.repository_owner }}
+  api_path:
+    description: "Endpoint to which output data will be sent, if provided"
+    required: false
 
 runs:
   using: "composite"
@@ -50,6 +53,7 @@ runs:
         echo "value=`basename ${{ github.repository }}`" >> $GITHUB_OUTPUT
         echo '
           {
+            "api_path": "${{ inputs.api_path }}"
             "library": {
               "name": "${{ inputs.library }}",
               "imports": ${{ inputs.imports }}

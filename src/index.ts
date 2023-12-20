@@ -3,8 +3,22 @@ import { getTempDir } from "./get-temp-dir";
 import { getOutput } from "./get-output";
 import { Input, Output } from "./types";
 import { getErrors, writeErrorsJson } from "./errors";
+import axios from "axios";
 
 main();
+
+async function sendDataRequest(jsonData: Output, route: string) {
+  try {
+    const { data } = await axios.post(route, jsonData, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    console.log("result", data);
+  } catch (e) {
+    console.log("An error occurred while submitting the output: ", e);
+  }
+}
 
 async function main() {
   const dir = getTempDir();
@@ -24,6 +38,9 @@ async function main() {
   const errorCount = getErrors().length;
   const repoCount = Object.keys(input.repos).length;
 
+  if (!errorCount && input.api_path) {
+    await sendDataRequest(output, input.api_path);
+  }
   console.log(
     `Repos ${repoCount} Success ${repoCount - errorCount} Errors ${errorCount}`,
   );

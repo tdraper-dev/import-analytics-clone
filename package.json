@@ -16,14 +16,15 @@
   "devDependencies": {
     "@types/node": "^20.10.3",
     "@types/shelljs": "^0.8.15",
-    "prettier": "3.1.0",
-    "typescript": "^5.3.2",
     "husky": "^8.0.3",
-    "lint-staged": "^13.3.0"
+    "lint-staged": "^13.3.0",
+    "prettier": "3.1.0",
+    "typescript": "^5.3.2"
   },
   "dependencies": {
-    "rimraf": "^5.0.5",
+    "axios": "^1.6.2",
     "glob": "^10.3.10",
+    "rimraf": "^5.0.5",
     "shelljs": "^0.8.5"
   },
   "lint-staged": {
