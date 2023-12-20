@@ -23,6 +23,10 @@ export interface Input {
    */
   api_path?: string;
   /**
+   * Unique indentifier to tag outgoing records in database
+   */
+  api_key?: string;
+  /**
    * Check repos for imports from library.
    */
   library: {

@@ -7,11 +7,16 @@ import axios from "axios";
 
 main();
 
-async function sendDataRequest(jsonData: Output, route: string) {
+async function sendDataRequest(
+  jsonData: Output,
+  route: string,
+  accessKey: string,
+) {
   try {
     const { data } = await axios.post(route, jsonData, {
       headers: {
         "Content-Type": "application/json",
+        Authorization: accessKey,
       },
     });
     console.log("result", data);
@@ -38,8 +43,8 @@ async function main() {
   const errorCount = getErrors().length;
   const repoCount = Object.keys(input.repos).length;
 
-  if (!errorCount && input.api_path) {
-    await sendDataRequest(output, input.api_path);
+  if (!errorCount && input.api_path && input.api_key) {
+    await sendDataRequest(output, input.api_path, input.api_key);
   }
   console.log(
     `Repos ${repoCount} Success ${repoCount - errorCount} Errors ${errorCount}`,
