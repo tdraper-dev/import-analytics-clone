@@ -82,7 +82,7 @@ export interface Output {
       dependencies: Record<string, boolean>;
       importsUsed: number;
       importsNotUsed: number;
-      imports: Record<string, { count: number }>;
+      imports: Record<string, { instanceCount: number }>;
       lastCommitDate: string;
     };
   };

@@ -33,7 +33,7 @@ export function calculateAggregates(
     }
 
     for (const importName in repo.imports) {
-      const importCount = repo.imports[importName].count;
+      const importCount = repo.imports[importName].instanceCount;
 
       aggregates.imports[importName].instanceCount += importCount;
       aggregates.imports[importName].repoCount += 1;

@@ -29,12 +29,14 @@ const findImports = (file: string, imports: string[], library: string) => {
           // Handle import instances that use `as` keywords
           .map((importInstance) => {
             // Check for `as` keyword
-            const importUsingAsKeyword = importInstance.match(MATCH_AS_KEYWORD_IMPORT)?.[1];
+            const importUsingAsKeyword = importInstance.match(
+              MATCH_AS_KEYWORD_IMPORT,
+            )?.[1];
 
             if (importUsingAsKeyword) {
               return importUsingAsKeyword;
             }
-            
+
             return importInstance;
           })
           // grab only the imports we care about
@@ -44,7 +46,6 @@ const findImports = (file: string, imports: string[], library: string) => {
       .flat()
       // remove empty "instances" (when import uses trailing comma)
       .filter((importInstance) => !!importInstance)
-      
   );
   // // remove commented out instances
   // .filter(importInstance => !importInstance.startsWith('/'));
@@ -64,7 +65,7 @@ export async function getImports(
     .map((file) => findImports(file, library.imports, library.name))
     .flat()
     .reduce((acc, curr) => {
-      if (!acc[curr]) acc[curr] = { count: 0 };
+      if (!acc[curr]) acc[curr] = { instanceCount: 0 };
       acc[curr].count += 1;
       return acc;
     }, {});
