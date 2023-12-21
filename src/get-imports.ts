@@ -66,7 +66,7 @@ export async function getImports(
     .flat()
     .reduce((acc, curr) => {
       if (!acc[curr]) acc[curr] = { instanceCount: 0 };
-      acc[curr].count += 1;
+      acc[curr].instanceCount += 1;
       return acc;
     }, {});
 }
