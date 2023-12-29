@@ -9,11 +9,9 @@ inputs:
   library:
     description: "Name of library whose component instance we will count"
     required: false
-    default: ""
   imports:
     description: "Names components whose instances we will count, please pass as a stringified array"
     required: false
-    default: ""
   hosting:
     description: "Hosting service"
     required: false
@@ -58,11 +56,11 @@ runs:
         echo "value=`basename ${{ github.repository }}`" >> $GITHUB_OUTPUT
         echo '
           {
-            "api_path": "${{ inputs.api_path || '' }}",
-            "api_key": "${{ inputs.api_key || '' }}",
+            "api_path": "${{ inputs.api_path || null }}",
+            "api_key": "${{ inputs.api_key || null }}",
             "library": {
-              "name": "${{ inputs.library || '' }}",
-              "imports": ${{ inputs.imports || '' }}
+              "name": "${{ inputs.library || null }}",
+              "imports": ${{ inputs.imports || null }}
             },
             "repos": [{
               "name": "${{ steps.repo-basename.outputs.value }}"
@@ -82,6 +80,10 @@ runs:
       uses: actions/setup-node@v3
       with:
         node-version: 18
+
+    - name: Test Check Input result
+      shell: bash
+      run: cat "${GITHUB_ACTION_PATH}/input.json"
 
     - name: Run Primary script
       shell: bash

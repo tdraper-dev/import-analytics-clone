@@ -61,7 +61,7 @@ async function main() {
   const input: Input = JSON.parse(
     readFileSync(__dirname + "/../input.json", "utf8"),
   );
-  console.log("state 3");
+  console.log("state 3", input);
 
   let config: Config | undefined;
 
