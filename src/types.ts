@@ -87,3 +87,9 @@ export interface Output {
     };
   };
 }
+
+export interface Config {
+  libraryName: string;
+  imports: string[] | undefined;
+  dependencies: string[] | undefined;
+}

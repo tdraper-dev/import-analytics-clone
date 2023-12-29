@@ -8,10 +8,10 @@ inputs:
     default: "true"
   library:
     description: "Name of library whose component instance we will count"
-    required: true
+    required: false
   imports:
     description: "Names components whose instances we will count, please pass as a stringified array"
-    required: true
+    required: false
   hosting:
     description: "Hosting service"
     required: false

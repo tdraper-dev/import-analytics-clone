@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { getTempDir } from "./get-temp-dir";
 import { getOutput } from "./get-output";
-import { Input, Output } from "./types";
+import { Config, Input, Output } from "./types";
 import { getErrors, writeErrorsJson } from "./errors";
 import axios from "axios";
 
@@ -19,9 +19,34 @@ async function sendDataRequest(
         Authorization: accessKey,
       },
     });
-    console.log("result", data);
+    if (!data.sucess) throw new Error("Submission failed");
   } catch (e) {
     console.log("An error occurred while submitting the output: ", e);
+  }
+}
+
+async function fetchConfigRequest(
+  params: Record<"repoName" | "libraryName", string>,
+  route: string,
+  accessKey: string,
+) {
+  try {
+    const url = new URL(route);
+    for (const key in params) {
+      if (params[key]) url.searchParams.set(key, params[key]);
+    }
+    const {
+      data: { data },
+    } = await axios.get<{ data: Config }>(url.toString(), {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: accessKey,
+      },
+    });
+    console.log("DATA RESULT FOR CONFIG ===> ", data);
+    return data;
+  } catch (e) {
+    console.log("An error occurred while fetching the config: ", e);
   }
 }
 
@@ -36,7 +61,25 @@ async function main() {
     readFileSync(__dirname + "/../input.json", "utf8"),
   );
 
-  const output: Output = await getOutput(dir, input);
+  let config: Config | undefined;
+
+  if (input.api_path && input.api_key) {
+    config = await fetchConfigRequest(
+      { libraryName: input.library.name, repoName: input.repos[0].name },
+      input.api_path,
+      input.api_key,
+    );
+  }
+  const finalInput: Input = {
+    ...input,
+    library: {
+      name: input.library.name || config.libraryName,
+      imports: input.library.imports || config.imports,
+    },
+    dependencies: input.dependencies || config.dependencies,
+  };
+
+  const output: Output = await getOutput(dir, finalInput);
 
   writeFileSync(__dirname + "/../output.json", JSON.stringify(output, null, 2));
 
