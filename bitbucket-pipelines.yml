@@ -1,0 +1,67 @@
+image: node:18
+
+pipelines:
+  default:
+    - parallel:
+        - variables:
+          - name: library
+            description: "Name of library whose component instance we will count"
+          - name: imports
+            description: "Names components whose instances we will count, please pass as a stringified array"
+          - name: hosting
+            description: "Hosting service"
+            default: "github"
+          - name: protocol
+            description: "Security protocol for github access"
+            default: "https"
+          - name: branch
+            description: "Branch off of which to read import count"
+            default: "main"
+          - name: password_token
+            description: "Password for cloning into repo"
+          - name: username
+            description: "Username for cloning into repo"
+          - name: api_path
+            description: "Endpoint to which output data will be sent, if provided"
+          - name: api_key
+            description: "Unique identifier to tag outgoing records in database"
+        - step:
+            name: "Repo's basename"
+            script:
+              - echo "value=`basename ${{ BITBUCKET_REPO_SLUG }}`" >> $BITBUCKET_OUTPUT
+        - step:
+            name: "Write JSON file"
+            script:
+              - >-
+                echo '
+                  {
+                    "api_path": "${{ api_path }}",
+                    "api_key": "${{ api_key }}",
+                    "library": {
+                      "name": "${{ library }}",
+                      "imports": ${{ imports }}
+                    },
+                    "repos": [{
+                      "name": "${{ BITBUCKET_REPO_SLUG }}"
+                    }],
+                    "git": {
+                      "username": "${{ username }}",
+                      "password": "${{ password_token }}",
+                      "owner": "${{ username }}",
+                      "protocol": "${{ protocol }}",
+                      "hosting": "${{ hosting }}",
+                      "branch": "${{ branch }}"
+                    }
+                  }
+                ' > "${BITBUCKET_CLONE_DIR}/input.json"
+        - step:
+            name: "Run Primary Script"
+            script: 
+              - cd ${BITBUCKET_CLONE_DIR} && npm install && npm run build && node ${BITBUCKET_CLONE_DIR}/dist/index.js
+        - step:
+            name: "Print final output"
+            script:
+              - echo "Results:"
+              - cat "${BITBUCKET_CLONE_DIR}/output.json"
+              - echo -e "\nErrors:"
+              - cat "${BITBUCKET_CLONE_DIR}/errors.json"
