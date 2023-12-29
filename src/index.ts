@@ -37,12 +37,15 @@ async function fetchConfigRequest(
     }
     const {
       data: { data },
-    } = await axios.get<{ data: Config } | undefined>(url.toString(), {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: accessKey,
+    } = await axios.get<{ data: Config; success: boolean } | undefined>(
+      url.toString(),
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: accessKey,
+        },
       },
-    });
+    );
     console.log("DATA RESULT FOR CONFIG ===> ", data);
     return data;
   } catch (e) {
