@@ -60,7 +60,7 @@ runs:
             "api_key": "${{ inputs.api_key || null }}",
             "library": {
               "name": "${{ inputs.library || null }}",
-              "imports": ${{ inputs.imports || null }}
+              "imports": "${{ inputs.imports || null }}"
             },
             "repos": [{
               "name": "${{ steps.repo-basename.outputs.value }}"
