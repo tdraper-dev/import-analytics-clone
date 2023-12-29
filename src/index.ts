@@ -13,13 +13,13 @@ async function sendDataRequest(
   accessKey: string,
 ) {
   try {
-    const { data } = await axios.post(route, jsonData, {
+    const { data } = await axios.post<{ success: boolean }>(route, jsonData, {
       headers: {
         "Content-Type": "application/json",
         Authorization: accessKey,
       },
     });
-    if (!data.sucess) throw new Error("Submission failed");
+    if (!data.success) throw new Error("Submission failed");
   } catch (e) {
     console.log("An error occurred while submitting the output: ", e);
   }
@@ -37,7 +37,7 @@ async function fetchConfigRequest(
     }
     const {
       data: { data },
-    } = await axios.get<{ data: Config }>(url.toString(), {
+    } = await axios.get<{ data: Config } | undefined>(url.toString(), {
       headers: {
         "Content-Type": "application/json",
         Authorization: accessKey,
@@ -63,7 +63,7 @@ async function main() {
   );
   console.log("state 3", input);
 
-  let config: Config | undefined;
+  let config: Config | undefined = undefined;
 
   if (input.api_path && input.api_key) {
     console.log("state 4");
