@@ -52,24 +52,32 @@ async function fetchConfigRequest(
 
 async function main() {
   const dir = getTempDir();
-
+  console.log("state 1");
   if (!existsSync(__dirname + "/../input.json")) {
     throw new Error("input.json not found");
   }
+  console.log("state 2");
 
   const input: Input = JSON.parse(
     readFileSync(__dirname + "/../input.json", "utf8"),
   );
+  console.log("state 3");
 
   let config: Config | undefined;
 
   if (input.api_path && input.api_key) {
+    console.log("state 4");
+
     config = await fetchConfigRequest(
       { libraryName: input.library.name, repoName: input.repos[0].name },
       input.api_path,
       input.api_key,
     );
+    console.log("state 5");
+    console.log("RETRIEVED CONFIG --> ", config);
   }
+
+  console.log("FINAL CONFIG ---> ", config);
   const finalInput: Input = {
     ...input,
     library: {
@@ -80,7 +88,7 @@ async function main() {
   };
 
   const output: Output = await getOutput(dir, finalInput);
-
+  console.log("state 6");
   writeFileSync(__dirname + "/../output.json", JSON.stringify(output, null, 2));
 
   const errorCount = getErrors().length;
