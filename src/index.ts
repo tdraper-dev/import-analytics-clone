@@ -78,6 +78,13 @@ async function main() {
     dependencies: input.dependencies || config?.dependencies,
   };
 
+  if (!finalInput.library.name) {
+    throw new Error("Library name unspecified or not found");
+  }
+  if (!finalInput.library.imports) {
+    throw new Error("Imports list unspecified or not found");
+  }
+
   const output: Output = await getOutput(dir, finalInput);
   writeFileSync(__dirname + "/../output.json", JSON.stringify(output, null, 2));
 
