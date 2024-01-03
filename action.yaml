@@ -81,6 +81,10 @@ runs:
       with:
         node-version: 18
 
+    - name: Test Check Input result
+      shell: bash
+      run: cat "${GITHUB_ACTION_PATH}/input.json"
+
     - name: Run Primary script
       shell: bash
       run: cd ${GITHUB_ACTION_PATH} && npm install && npm run build && node ${GITHUB_ACTION_PATH}/dist/index.js
