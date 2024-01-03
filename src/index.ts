@@ -72,10 +72,10 @@ async function main() {
   const finalInput: Input = {
     ...input,
     library: {
-      name: input.library.name || config.libraryName,
-      imports: input.library.imports || config.imports,
+      name: input.library.name || config?.libraryName,
+      imports: input.library.imports || config?.imports,
     },
-    dependencies: input.dependencies || config.dependencies,
+    dependencies: input.dependencies || config?.dependencies,
   };
 
   const output: Output = await getOutput(dir, finalInput);
